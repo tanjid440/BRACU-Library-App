@@ -54,7 +54,7 @@ export default class Login extends Component {
           cookie = cookie['set-cookie']
           this.session.setCookie(cookie)
           this.session.setLogin(true)
-          this.props.navigation.navigate('Home')
+          this.props.navigation.push('Home')
         } else {
           Alert.alert('Error!', 'Login Failed! Wrong userid or password!')
         }

@@ -31,7 +31,7 @@ export default class Home extends Component {
         .then(html => {
           const HTMLparser = require('fast-html-parser')
           const root = HTMLparser.parse(html)
-          let booksCount = root.querySelectorAll('a.title').length
+          let booksCount = (root.querySelector('#opac-user-views').querySelector('a').rawText).match(/\d/g)[0]
           this.setState({ booksCount })
         })
         .catch(error => console.log(error))
@@ -43,7 +43,10 @@ export default class Home extends Component {
           const fine = root.querySelector('td.sum').rawText
           this.setState({ fine })
         })
-        .catch(error => console.log(error))
+        .catch(error => {
+          this.setState({ profile: { ...this.state.profile, totalFine: '0.00' } })
+          console.log(error)
+        })
     }
   }
 
@@ -53,6 +56,7 @@ export default class Home extends Component {
         initialRouteName="MyBooks"
         shifting={true}
         activeColor="#2B4D66"
+        backBehavior='initialRoute'
         barStyle={{ backgroundColor: 'white', paddingVertical: 4 }}
       >
         <Tab.Screen name="MyBooks" component={MyBooks} options={{

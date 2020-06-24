@@ -41,7 +41,10 @@ export default class Profile extends Component {
           const totalFine = root.querySelector('td.sum').rawText
           this.setState({ profile: { ...this.state.profile, totalFine } })
         })
-        .catch(error => console.log(error))
+        .catch(error => {
+          this.setState({ profile: { ...this.state.profile, totalFine: '0.00' } })
+          console.log(error)
+        })
     }
   }
 
@@ -56,7 +59,7 @@ export default class Profile extends Component {
             <View style={styles.border}>
               <Image source={{ uri: 'http://115.127.80.41/cgi-bin/koha/opac-patron-image.pl', headers: { 'cookie': this.session.cookie } }} style={styles.image} />
             </View>
-            <Text style={{ fontSize: 30, color: '#4b6584', fontWeight: 'bold' }}>{this.state.profile.name}</Text>
+            <Text style={{ fontSize: 30, color: '#4b6584', fontWeight: 'bold', textAlign: 'center' }}>{this.state.profile.name}</Text>
             <Text style={{ fontSize: 14, color: '#778ca3' }}>{this.state.profile.degree}, {this.state.profile.dept}</Text>
             <View style={{ flex: 1, flexDirection: 'row', width: '100%', alignItems: 'center', justifyContent: 'space-around' }}>
               <View>
