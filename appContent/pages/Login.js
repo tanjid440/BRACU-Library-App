@@ -18,26 +18,27 @@ import { SessionContext } from '../contexts/SessionContext';
 
 export default class Login extends Component {
 
+  static contextType = SessionContext
+  session = this.context
+
   state = {
-    userid: '',
+    userid: this.context.savedid,
     password: '',
     showPass: true,
-    saveId: false,
+    saveId: (this.context.saveit == 'true'),
     moreThanOneError: false,
     activityModal: false
   }
 
-  static contextType = SessionContext
-  session = this.context
-
   setUserId = val => this.setState({ userid: val })
   setPasswd = val => this.setState({ password: val })
-  saveid = val => { this.setState({ saveId: val }); this.saveDetails(val) }
+  saveid = val => { this.setState({ saveId: val }); if (!val) { this.saveDetails(false) }}
   showModal = _ => this.setState({ activityModal: true })
   hideModal = _ => this.setState({ activityModal: false })
 
   login = _ => {
     this.showModal()
+    this.saveDetails(this.state.saveId)
     const url = 'http://115.127.80.41/cgi-bin/koha/opac-user.pl'
     const id = this.state.userid
     const password = this.state.password
@@ -74,22 +75,20 @@ export default class Login extends Component {
       try {
         await AsyncStorage.setItem('@userid', this.state.userid)
         await AsyncStorage.setItem('@saveit', 'true')
-      } catch(error) {
+      } catch (error) {
         Alert.alert('Error!', 'Could not save userid.')
       }
     } else {
       try {
         await AsyncStorage.setItem('@userid', '')
         await AsyncStorage.setItem('@saveit', 'false')
-      } catch(error) {
+      } catch (error) {
         Alert.alert('Error!', 'Could not remove saved userid.')
       }
     }
   }
 
   render() {
-    console.log(this.state.saveId);
-    
     return (
       <TouchableWithoutFeedback onPress={_ => Keyboard.dismiss()}>
         <View style={styles.container}>
@@ -120,11 +119,11 @@ export default class Login extends Component {
                 </TouchableOpacity>
               </View>
             </View>
-            <View style={{ flexDirection: 'row' , alignItems: 'center', justifyContent: 'center', marginVertical: 5 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginVertical: 5 }}>
               <CheckBox
                 value={this.state.saveId}
                 onValueChange={this.saveid} />
-                <Text>Save USER ID</Text>
+              <Text>Save USER ID</Text>
             </View>
             <TouchableOpacity onPress={this.login}>
               <View style={styles.border}>
