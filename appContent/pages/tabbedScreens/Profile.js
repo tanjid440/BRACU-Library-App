@@ -57,8 +57,13 @@ export default class Profile extends Component {
         {this.state.isLoaded ?
           <View style={styles.content}>
             <View style={styles.border}>
-              <Image source={{ uri: `http://115.127.80.41/cgi-bin/koha/opac-patron-image.pl?customCacheControl=${Math.random().toString().substr(2,5)}`, headers: { 'cookie': this.session.cookie } }} style={styles.image} loadingIndicatorSource={require('../../../assets/default-user.png')} />
-             </View>
+              <Image source={{
+                uri: `http://115.127.80.41/cgi-bin/koha/opac-patron-image.pl?${Math.random().toString().substr(2, 5)}`,
+                headers: { 'cookie': this.session.cookie }
+              }}
+                style={styles.image}
+                onError={_=> console.log('Profile Picture Not Loaded!')} />
+            </View>
             <Text style={{ fontSize: 30, color: '#4b6584', fontWeight: 'bold', textAlign: 'center' }}>{this.state.profile.name}</Text>
             <Text style={{ fontSize: 14, color: '#778ca3' }}>{this.state.profile.degree}, {this.state.profile.dept}</Text>
             <View style={{ flex: 1, flexDirection: 'row', width: '100%', alignItems: 'center', justifyContent: 'space-around' }}>

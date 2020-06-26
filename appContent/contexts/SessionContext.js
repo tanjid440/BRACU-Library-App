@@ -11,6 +11,7 @@ export default class SessionProvider extends Component {
     this.state = {
       cookie: 'null',
       setCookie: val => this.setState({ cookie: val }),
+      clearCookie: _ => this.setState({ cookie: 'empty' }),
       isLoggedIn: false,
       setLogin: val => this.setState({ isLoggedIn: val }),
       asyncDone: false,

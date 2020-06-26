@@ -56,7 +56,7 @@ export default class Home extends Component {
         initialRouteName="MyBooks"
         shifting={true}
         activeColor="#2B4D66"
-        backBehavior='initialRoute'
+        backBehavior='none'
         barStyle={{ backgroundColor: 'white', paddingVertical: 4 }}
       >
         <Tab.Screen name="MyBooks" component={MyBooks} options={{

@@ -15,7 +15,18 @@ export default class MyBooks extends Component {
   session = this.context
 
   // exitApp = _ => {
-  //   this.props.navigation.pop()
+  //   Alert.alert('Logout?', 'Are you sure want to logout?',
+  //     [
+  //       { text: 'NO', style: 'cancel' },
+  //       {
+  //         text: 'YES', onPress: () => {
+  //           this.session.clearCookie()
+  //           console.log(this.session.cookie);
+  //           this.props.navigation.pop()
+  //         }
+  //       }
+  //     ])
+  //   return true
   // }
 
   componentDidMount() {
@@ -82,8 +93,8 @@ export default class MyBooks extends Component {
               <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                 <Image
                   source={require('../../../assets/box.png')}
-                  style={{ width: 150, height: 150, opacity: 0.7}} />
-                <Text style={{ fontSize: 26, fontWeight: 'bold', marginTop: 10 ,color: '#aaa'}}>No Books</Text>
+                  style={{ width: 150, height: 150, opacity: 0.7 }} />
+                <Text style={{ fontSize: 26, fontWeight: 'bold', marginTop: 10, color: '#aaa' }}>No Books</Text>
               </View>
             :
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
