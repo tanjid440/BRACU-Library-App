@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { View, Text, StyleSheet, FlatList, Image, ActivityIndicator, BackHandler, Alert } from 'react-native'
 import { SessionContext } from '../../contexts/SessionContext'
-import RNCloseApp from 'react-native-close-app';
 import BookList from '../../components/BookList'
 import Header from '../../components/Header'
 
