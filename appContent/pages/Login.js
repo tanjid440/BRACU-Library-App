@@ -123,7 +123,7 @@ export default class Login extends Component {
               <CheckBox
                 value={this.state.saveId}
                 onValueChange={this.saveid} />
-              <Text>Save USER ID</Text>
+              <Text>SAVE USER ID</Text>
             </View>
             <TouchableOpacity onPress={this.login}>
               <View style={styles.border}>
