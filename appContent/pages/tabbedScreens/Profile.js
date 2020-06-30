@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, Text, StyleSheet, Image, ActivityIndicator } from 'react-native'
+import { View, Text, StyleSheet, Image, ActivityIndicator, Alert } from 'react-native'
 import { SessionContext } from '../../contexts/SessionContext'
 import Header from '../../components/Header'
 
@@ -58,11 +58,11 @@ export default class Profile extends Component {
           <View style={styles.content}>
             <View style={styles.border}>
               <Image source={{
-                uri: `http://115.127.80.41/cgi-bin/koha/opac-patron-image.pl?${Math.random().toString().substr(2, 5)}`,
-                headers: { 'cookie': this.session.cookie }
+                uri: `http://library.bracu.ac.bd/cgi-bin/koha/opac-patron-image.pl?${Math.random().toString().substr(2, 5)}`,
+                headers: { 'Cookie': this.session.cookie }
               }}
                 style={styles.image}
-                onError={_=> console.log('Profile Picture Not Loaded!')} />
+                onError={_=> Alert.alert('Error','Unable to load Profile Picture! Please restart the application.')} />
             </View>
             <Text style={{ fontSize: 30, color: '#4b6584', fontWeight: 'bold', textAlign: 'center' }}>{this.state.profile.name}</Text>
             <Text style={{ fontSize: 14, color: '#778ca3' }}>{this.state.profile.degree}, {this.state.profile.dept}</Text>

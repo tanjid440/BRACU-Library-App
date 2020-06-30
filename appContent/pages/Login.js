@@ -24,6 +24,7 @@ export default class Login extends Component {
   state = {
     userid: this.context.savedid,
     password: '',
+    loginURL: `http://115.127.80.41/cgi-bin/koha/opac-user.pl?${Math.random().toString().substr(2, 5)}`,
     showPass: true,
     saveId: (this.context.saveit == 'true'),
     moreThanOneError: false,
@@ -32,42 +33,56 @@ export default class Login extends Component {
 
   setUserId = val => this.setState({ userid: val })
   setPasswd = val => this.setState({ password: val })
-  saveid = val => { this.setState({ saveId: val }); if (!val) { this.saveDetails(false) }}
+  saveid = val => { this.setState({ saveId: val }); if (!val) { this.saveDetails(false) } }
   showModal = _ => this.setState({ activityModal: true })
   hideModal = _ => this.setState({ activityModal: false })
 
   login = _ => {
-    this.showModal()
-    this.saveDetails(this.state.saveId)
-    const url = 'http://115.127.80.41/cgi-bin/koha/opac-user.pl'
+    const url = this.state.loginURL
     const id = this.state.userid
     const password = this.state.password
-    const credential = new FormData()
-    credential.append('userid', id)
-    credential.append('password', password)
-    credential.append('koha_login_context', 'opac')
-    fetch(url, { method: 'POST', body: credential })
-      .then(res => {
-        let cookie = res.headers.map
-        this.hideModal()
-        if (cookie.hasOwnProperty('content-style-type')) {
-          cookie = cookie['set-cookie']
-          this.session.setCookie(cookie)
-          this.session.setLogin(true)
-          this.props.navigation.push('Home')
-        } else {
-          Alert.alert('Error!', 'Login Failed! Wrong userid or password!')
-        }
-      })
-      .catch(error => {
-        this.hideModal()
-        if (!this.state.moreThanOneError) {
-          Alert.alert('Error!', 'Login Failed! Please check your internet connection and try again')
-          this.setState({ moreThanOneError: true })
-        } else {
-          Alert.alert('Error!', 'It seems that you are having trouble logging in. Please make sure your internet is working and you can login normally using the library website. If this problem persists, please contact with the developer.')
-        }
-      })
+    if (id && password) {
+      this.showModal()
+      this.saveDetails(this.state.saveId)
+      const credential = new FormData()
+      credential.append('userid', id)
+      credential.append('password', password)
+      credential.append('koha_login_context', 'opac')
+      fetch(url, { method: 'POST', body: credential })
+        .then(res => {
+          let cookie = res.headers.map['set-cookie']
+          fetch(url, { method: 'GET' })
+            .then(res => res.text())
+            .then(html => {
+              const Parser = require('fast-html-parser')
+              const root = Parser.parse(html)
+              if (!(root.querySelector('title').rawText).includes('Log in')) {
+                this.session.setCookie(cookie)
+                this.session.setLogin(true)
+                this.hideModal()
+                this.props.navigation.push('Home')
+              } else {
+                this.hideModal()
+                Alert.alert('Error!', 'Login Failed! Wrong userid or password!')
+              }
+            })
+            .catch(error => {
+              this.hideModal()
+              Alert.alert('Error', 'Could not validate Login info!')
+            })
+        })
+        .catch(error => {
+          this.hideModal()
+          if (!this.state.moreThanOneError) {
+            Alert.alert('Error!', 'Login Failed! Please check your internet connection and try again')
+            this.setState({ moreThanOneError: true })
+          } else {
+            Alert.alert('Error!', 'It seems that you are having trouble logging in. Please make sure your internet is working and you can login normally using the library website. If this problem persists, please contact with the developer.')
+          }
+        })
+    } else {
+      Alert.alert('Error', 'USER ID or PASSWORD cannot be empty!')
+    }
   }
 
   saveDetails = async val => {
@@ -76,14 +91,18 @@ export default class Login extends Component {
         await AsyncStorage.setItem('@userid', this.state.userid)
         await AsyncStorage.setItem('@saveit', 'true')
       } catch (error) {
+        this.hideModal()
         Alert.alert('Error!', 'Could not save userid.')
+        this.showModal()
       }
     } else {
       try {
         await AsyncStorage.setItem('@userid', '')
         await AsyncStorage.setItem('@saveit', 'false')
       } catch (error) {
+        this.hideModal()
         Alert.alert('Error!', 'Could not remove saved userid.')
+        this.showModal()
       }
     }
   }

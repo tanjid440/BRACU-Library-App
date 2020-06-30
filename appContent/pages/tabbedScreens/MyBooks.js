@@ -14,23 +14,22 @@ export default class MyBooks extends Component {
   static contextType = SessionContext
   session = this.context
 
-  // exitApp = _ => {
-  //   Alert.alert('Logout?', 'Are you sure want to logout?',
-  //     [
-  //       { text: 'NO', style: 'cancel' },
-  //       {
-  //         text: 'YES', onPress: () => {
-  //           this.session.clearCookie()
-  //           console.log(this.session.cookie);
-  //           this.props.navigation.pop()
-  //         }
-  //       }
-  //     ])
-  //   return true
-  // }
+  exitApp = _ => {
+    Alert.alert('Logout?', 'Are you sure want to logout?',
+      [
+        { text: 'NO', style: 'cancel' },
+        {
+          text: 'YES', onPress: () => {
+            const RCTNetworking = require('react-native/Libraries/Network/RCTNetworking')
+            RCTNetworking.clearCookies(_ => this.props.navigation.pop())
+          }
+        }
+      ])
+    return true
+  }
 
   componentDidMount() {
-    // this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.exitApp)
+    this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.exitApp)
     if (this.session.isLoggedIn && !this.state.isLoaded) {
       fetch('http://115.127.80.41/cgi-bin/koha/opac-user.pl', {
         method: 'GET',
@@ -70,9 +69,9 @@ export default class MyBooks extends Component {
     }
   }
 
-  // componentWillUnmount() {
-  //   this.backHandler.remove()
-  // }
+  componentWillUnmount() {
+    this.backHandler.remove()
+  }
 
   render() {
     return (
