@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
   Alert,
   CheckBox,
-  AsyncStorage
+  AsyncStorage,
 } from 'react-native';
 import { SessionContext } from '../contexts/SessionContext';
 
@@ -25,10 +25,12 @@ export default class Login extends Component {
     userid: this.context.savedid,
     password: '',
     loginURL: `http://115.127.80.41/cgi-bin/koha/opac-user.pl?${Math.random().toString().substr(2, 5)}`,
-    showPass: true,
     saveId: (this.context.saveit == 'true'),
+    showPass: true,
     moreThanOneError: false,
-    activityModal: false
+    activityModal: false,
+    showError: false,
+    errorMSG: ''
   }
 
   setUserId = val => this.setState({ userid: val })
@@ -36,6 +38,8 @@ export default class Login extends Component {
   saveid = val => { this.setState({ saveId: val }); if (!val) { this.saveDetails(false) } }
   showModal = _ => this.setState({ activityModal: true })
   hideModal = _ => this.setState({ activityModal: false })
+  showError = msg => this.setState({ showError: true, errorMSG: msg })
+  hideError = _ => this.setState({ showError: false })
 
   login = _ => {
     const url = this.state.loginURL
@@ -63,26 +67,30 @@ export default class Login extends Component {
                 this.props.navigation.push('Home')
               } else {
                 this.hideModal()
-                Alert.alert('Error!', 'Login Failed! Wrong userid or password!')
+                this.showError('Login Failed! Wrong userid or password!')
               }
             })
             .catch(error => {
               this.hideModal()
-              Alert.alert('Error', 'Could not validate Login info!')
+              this.showError('Could not validate Login info!')
             })
         })
         .catch(error => {
           this.hideModal()
           if (!this.state.moreThanOneError) {
-            Alert.alert('Error!', 'Login Failed! Please check your internet connection and try again')
+            this.showError('Login Failed! Please check your internet connection and try again')
             this.setState({ moreThanOneError: true })
           } else {
-            Alert.alert('Error!', 'It seems that you are having trouble logging in. Please make sure your internet is working and you can login normally using the library website. If this problem persists, please contact with the developer.')
+            this.showError('It seems that you are having trouble logging in. Please make sure your internet is working and you can login normally using the library website. If this problem persists, please contact with the developer.')
           }
         })
     } else {
-      Alert.alert('Error', 'USER ID or PASSWORD cannot be empty!')
+      this.showError('USER ID or PASSWORD cannot be empty!')
     }
+  }
+
+  showError() {
+    this.setState({ error: true })
   }
 
   saveDetails = async val => {
@@ -166,6 +174,29 @@ export default class Login extends Component {
               </View>
             </View>
           </Modal>
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={this.state.showError}
+          >
+            <View style={styles.modalbg}>
+              <View style={styles.modalBorder}>
+                <View style={styles.errorModal}>
+                  <View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20, backgroundColor: '#fab1a025', padding: 10 }}>
+                      <Image source={require('../../assets/alert.png')} style={{ width: 38, height: 38, marginHorizontal: 10 }} />
+                      <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#555' }}>Error</Text>
+                    </View>
+                    <Text style={{ fontSize: 16, color: '#555', marginBottom: 20, textAlign: 'center', lineHeight: 22, paddingHorizontal: 20 }}>{this.state.errorMSG}</Text>
+                    <TouchableOpacity style={{ borderWidth: 1, borderColor: '#eee', backgroundColor: '#eeeeeeaa' }}
+                      onPress={this.hideError}>
+                      <Text style={{ color: '#777', paddingVertical: 14, textAlign: 'center', fontSize: 16, fontWeight: 'bold' }}>OK</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </Modal>
         </View>
       </TouchableWithoutFeedback>
     );
@@ -228,7 +259,7 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     borderWidth: 1,
     borderColor: '#2B4D66',
-    padding: 3
+    padding: 2
   },
   modalbg: {
     flex: 1,
@@ -245,11 +276,17 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: '#2B4D66'
   },
+  errorModal: {
+    justifyContent: 'center',
+    backgroundColor: 'white',
+    borderWidth: 3,
+    borderColor: '#ff767590'
+  },
   modalBorder: {
-    marginVertical: 24,
+    marginVertical: 16,
     borderWidth: 1,
-    borderColor: '#2B4D66',
-    padding: 3,
+    borderColor: '#ff767590',
+    padding: 2,
     width: '95%'
   },
 })

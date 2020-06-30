@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, FlatList, Image, ActivityIndicator, BackHandler
 import { SessionContext } from '../../contexts/SessionContext'
 import BookList from '../../components/BookList'
 import Header from '../../components/Header'
+import { Modal } from 'react-native-paper'
 
 export default class MyBooks extends Component {
 
