@@ -10,7 +10,6 @@ import {
   Keyboard,
   Modal,
   ActivityIndicator,
-  Alert,
   CheckBox,
   AsyncStorage,
 } from 'react-native';
@@ -62,9 +61,8 @@ export default class Login extends Component {
               const root = Parser.parse(html)
               if (!(root.querySelector('title').rawText).includes('Log in')) {
                 this.session.setCookie(cookie)
-                this.session.setLogin(true)
                 this.hideModal()
-                this.props.navigation.push('Home')
+                this.props.navigation.push('Home', root)
               } else {
                 this.hideModal()
                 this.showError('Login Failed! Wrong userid or password!')
@@ -100,7 +98,7 @@ export default class Login extends Component {
         await AsyncStorage.setItem('@saveit', 'true')
       } catch (error) {
         this.hideModal()
-        Alert.alert('Error!', 'Could not save userid.')
+        this.showError('Could not save userid.')
         this.showModal()
       }
     } else {
@@ -109,7 +107,7 @@ export default class Login extends Component {
         await AsyncStorage.setItem('@saveit', 'false')
       } catch (error) {
         this.hideModal()
-        Alert.alert('Error!', 'Could not remove saved userid.')
+        this.showError('Could not remove saved userid.')
         this.showModal()
       }
     }
@@ -180,14 +178,16 @@ export default class Login extends Component {
             visible={this.state.showError}
           >
             <View style={styles.modalbg}>
-              <View style={styles.modalBorder}>
+              <View style={{ ...styles.modalBorder, borderColor: '#ff767590' }}>
                 <View style={styles.errorModal}>
                   <View>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20, backgroundColor: '#fab1a025', padding: 10 }}>
                       <Image source={require('../../assets/alert.png')} style={{ width: 38, height: 38, marginHorizontal: 10 }} />
                       <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#555' }}>Error</Text>
                     </View>
-                    <Text style={{ fontSize: 16, color: '#555', marginBottom: 20, textAlign: 'center', lineHeight: 22, paddingHorizontal: 20 }}>{this.state.errorMSG}</Text>
+                    <Text style={{ fontSize: 16, color: '#555', marginBottom: 20, textAlign: 'center', lineHeight: 22, paddingHorizontal: 20 }}>
+                      {this.state.errorMSG}
+                    </Text>
                     <TouchableOpacity style={{ borderWidth: 1, borderColor: '#eee', backgroundColor: '#eeeeeeaa' }}
                       onPress={this.hideError}>
                       <Text style={{ color: '#777', paddingVertical: 14, textAlign: 'center', fontSize: 16, fontWeight: 'bold' }}>OK</Text>
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
   modalBorder: {
     marginVertical: 16,
     borderWidth: 1,
-    borderColor: '#ff767590',
+    borderColor: '#2B4D66',
     padding: 2,
     width: '95%'
   },

@@ -6,6 +6,11 @@ import MyBooks from './tabbedScreens/MyBooks';
 import Profile from './tabbedScreens/Profile';
 import Search from './tabbedScreens/Search';
 import About from './tabbedScreens/DevInfo';
+import { YellowBox } from 'react-native';
+
+YellowBox.ignoreWarnings([
+  'Non-serializable values were found in the navigation state',
+]);
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -20,34 +25,21 @@ export default class Home extends Component {
   }
 
   componentDidMount() {
-    if (this.session.isLoggedIn) {
-      fetch('http://115.127.80.41/cgi-bin/koha/opac-user.pl', {
-        method: 'GET',
-        headers: {
-          'cookie': this.session.cookie
-        }
+    const root = this.props.route.params
+    const booksCount = root.querySelectorAll('a.title').length
+    this.setState({ booksCount })
+    fetch('http://115.127.80.41/cgi-bin/koha/opac-account.pl', { method: 'GET', headers: { 'set-cookie': this.session.cookie } })
+      .then(res => res.text())
+      .then(html => {
+        const HTMLparser = require('fast-html-parser')
+        const root = HTMLparser.parse(html)
+        const fine = root.querySelector('td.sum').rawText
+        this.setState({ fine })
       })
-        .then(res => res.text())
-        .then(html => {
-          const HTMLparser = require('fast-html-parser')
-          const root = HTMLparser.parse(html)
-          let booksCount = (root.querySelector('#opac-user-views').querySelector('a').rawText).match(/\d/g)[0]
-          this.setState({ booksCount })
-        })
-        .catch(error => console.log(error))
-      fetch('http://115.127.80.41/cgi-bin/koha/opac-account.pl', { method: 'GET', headers: { 'set-cookie': this.session.cookie } })
-        .then(res => res.text())
-        .then(html => {
-          const HTMLparser = require('fast-html-parser')
-          const root = HTMLparser.parse(html)
-          const fine = root.querySelector('td.sum').rawText
-          this.setState({ fine })
-        })
-        .catch(error => {
-          this.setState({ profile: { ...this.state.profile, totalFine: '0.00' } })
-          console.log(error)
-        })
-    }
+      .catch(error => {
+        this.setState({ fine: '0.00' })
+        this.setState({ profile: { ...this.state.profile, totalFine: '0.00' } })
+      })
   }
 
   render() {
@@ -59,7 +51,7 @@ export default class Home extends Component {
         backBehavior='none'
         barStyle={{ backgroundColor: 'white', paddingVertical: 4 }}
       >
-        <Tab.Screen name="MyBooks" component={MyBooks} options={{
+        <Tab.Screen name="MyBooks" children={_ => <MyBooks root={this.props.route.params} />} options={{
           title: 'My Books',
           tabBarIcon: _ => <Image source={require('../../assets/book.png')} style={{ width: 24, height: 24 }} />,
           tabBarBadge: this.state.booksCount

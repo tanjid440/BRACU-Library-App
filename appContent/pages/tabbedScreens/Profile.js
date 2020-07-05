@@ -15,7 +15,7 @@ export default class Profile extends Component {
 
   componentDidMount() {
     const HTMLparser = require('fast-html-parser')
-    if (this.session.isLoggedIn && !this.state.isLoaded) {
+    if (!this.state.isLoaded) {
       fetch('http://115.127.80.41/cgi-bin/koha/opac-memberentry.pl', { method: 'GET', headers: { 'cookie': this.session.cookie } })
         .then(res => res.text())
         .then(html => {
